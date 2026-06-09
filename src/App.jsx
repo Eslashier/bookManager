@@ -183,8 +183,12 @@ export default function App() {
       {/* Panel de estadísticas */}
       <div className={`chart-panel${statsOpen ? '' : ' chart-collapsed'}`}>
         <button className="chart-toggle" onClick={toggleStats} aria-expanded={statsOpen}>
-          <span className="chart-title">{activeCatLabel}</span>
-          <span className="chart-subtitle">{stats.total} libros</span>
+          <span className="chart-title">Estadísticas</span>
+          {!statsOpen && (
+            <span className="chart-summary">
+              {activeCatLabel} · <strong>{stats.have}</strong>/{stats.total} tengo · <strong>{stats.read}</strong>/{stats.total} leídos
+            </span>
+          )}
           <span className="chart-chevron">{statsOpen ? '▲' : '▼'}</span>
         </button>
 

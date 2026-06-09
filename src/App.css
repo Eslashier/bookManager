@@ -232,6 +232,16 @@ body {
   font-family: var(--font-ui);
 }
 
+.chart-summary {
+  font-size: 0.78rem;
+  color: var(--text-muted);
+  font-family: var(--font-ui);
+}
+
+.chart-summary strong {
+  color: var(--text);
+}
+
 .chart-chevron {
   margin-left: auto;
   font-size: 0.65rem;
