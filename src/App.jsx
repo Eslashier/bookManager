@@ -93,11 +93,6 @@ export default function App() {
     [activeCategory]
   )
 
-  // Estadísticas globales (header)
-  const globalHave = BOOKS.filter(b => checks[b.id]?.have).length
-  const globalRead = BOOKS.filter(b => checks[b.id]?.read).length
-  const total = BOOKS.length
-
   // Estadísticas del filtro activo (panel de gráfico)
   const stats = useMemo(() => {
     const t = filtered.length
@@ -159,17 +154,7 @@ export default function App() {
           </div>
         )}
 
-        <div className="stats">
-          <span className="stat">
-            <span className="stat-number">{globalHave}</span>
-            <span className="stat-label"> de {total} tengo</span>
-          </span>
-          <span className="stat-sep">·</span>
-          <span className="stat">
-            <span className="stat-number">{globalRead}</span>
-            <span className="stat-label"> de {total} leídos</span>
-          </span>
-        </div>
+
       </header>
 
       <nav className="filters">

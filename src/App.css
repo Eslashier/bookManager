@@ -160,25 +160,6 @@ body {
   border-color: #4a2020;
 }
 
-/* ── Stats ── */
-.stats {
-  font-family: var(--font-ui);
-  font-size: 0.95rem;
-  color: var(--text-muted);
-  display: flex;
-  align-items: center;
-  gap: 8px;
-}
-
-.stat-number {
-  font-weight: 700;
-  color: var(--text);
-  font-size: 1.05rem;
-}
-
-.stat-sep {
-  color: var(--border);
-}
 
 /* ── Filtros ── */
 .filters {
