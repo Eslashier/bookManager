@@ -4,6 +4,7 @@ import './App.css'
 
 const STORAGE_KEY = 'sk-books-checklist'
 const THEME_KEY = 'sk-books-theme'
+const STATS_KEY = 'sk-books-stats-open'
 
 function loadState() {
   try {
@@ -30,6 +31,9 @@ export default function App() {
   const [checks, setChecks] = useState(loadState)
   const [activeCategory, setActiveCategory] = useState('all')
   const [theme, setTheme] = useState(loadTheme)
+  const [statsOpen, setStatsOpen] = useState(
+    () => localStorage.getItem(STATS_KEY) !== 'false'
+  )
   const [importMsg, setImportMsg] = useState(null)
   const fileInputRef = useRef(null)
 
@@ -42,6 +46,13 @@ export default function App() {
 
   function toggleTheme() {
     setTheme(t => (t === 'light' ? 'dark' : 'light'))
+  }
+
+  function toggleStats() {
+    setStatsOpen(o => {
+      localStorage.setItem(STATS_KEY, String(!o))
+      return !o
+    })
   }
 
   function toggle(id, field) {
@@ -170,72 +181,65 @@ export default function App() {
       </nav>
 
       {/* Panel de estadísticas */}
-      <div className="chart-panel">
-        <div className="chart-heading">
+      <div className={`chart-panel${statsOpen ? '' : ' chart-collapsed'}`}>
+        <button className="chart-toggle" onClick={toggleStats} aria-expanded={statsOpen}>
           <span className="chart-title">{activeCatLabel}</span>
           <span className="chart-subtitle">{stats.total} libros</span>
-        </div>
+          <span className="chart-chevron">{statsOpen ? '▲' : '▼'}</span>
+        </button>
 
-        <div className="progress-row">
-          <span className="progress-label">Lo tengo</span>
-          <div className="progress-track">
-            <div className="progress-fill have" style={{ width: `${stats.havePct}%` }} />
-          </div>
-          <span className="progress-info">
-            <strong>{stats.have}</strong>/{stats.total}
-            <span className="progress-pct">{stats.havePct}%</span>
-          </span>
-        </div>
+        {statsOpen && (
+          <>
+            <div className="progress-row">
+              <span className="progress-label">Lo tengo</span>
+              <div className="progress-track">
+                <div className="progress-fill have" style={{ width: `${stats.havePct}%` }} />
+              </div>
+              <span className="progress-info">
+                <strong>{stats.have}</strong>/{stats.total}
+                <span className="progress-pct">{stats.havePct}%</span>
+              </span>
+            </div>
 
-        <div className="progress-row">
-          <span className="progress-label">Lo leí</span>
-          <div className="progress-track">
-            <div className="progress-fill read" style={{ width: `${stats.readPct}%` }} />
-          </div>
-          <span className="progress-info">
-            <strong>{stats.read}</strong>/{stats.total}
-            <span className="progress-pct">{stats.readPct}%</span>
-          </span>
-        </div>
+            <div className="progress-row">
+              <span className="progress-label">Lo leí</span>
+              <div className="progress-track">
+                <div className="progress-fill read" style={{ width: `${stats.readPct}%` }} />
+              </div>
+              <span className="progress-info">
+                <strong>{stats.read}</strong>/{stats.total}
+                <span className="progress-pct">{stats.readPct}%</span>
+              </span>
+            </div>
 
-        <div className="stacked-bar">
-          {stats.read > 0 && (
-            <div
-              className="seg seg-read"
-              style={{ width: `${stats.readPct}%` }}
-              title={`Leídos: ${stats.read}`}
-            />
-          )}
-          {stats.haveOnly > 0 && (
-            <div
-              className="seg seg-have"
-              style={{ width: `${stats.haveOnlyPct}%` }}
-              title={`Tengo, sin leer: ${stats.haveOnly}`}
-            />
-          )}
-          {stats.neither > 0 && (
-            <div
-              className="seg seg-none"
-              style={{ width: `${stats.neitherPct}%` }}
-              title={`Sin leer: ${stats.neither}`}
-            />
-          )}
-        </div>
+            <div className="stacked-bar">
+              {stats.read > 0 && (
+                <div className="seg seg-read" style={{ width: `${stats.readPct}%` }} title={`Leídos: ${stats.read}`} />
+              )}
+              {stats.haveOnly > 0 && (
+                <div className="seg seg-have" style={{ width: `${stats.haveOnlyPct}%` }} title={`Tengo, sin leer: ${stats.haveOnly}`} />
+              )}
+              {stats.neither > 0 && (
+                <div className="seg seg-none" style={{ width: `${stats.neitherPct}%` }} title={`Sin leer: ${stats.neither}`} />
+              )}
+            </div>
 
-        <div className="stacked-legend">
-          <span className="legend-item">
-            <span className="legend-dot dot-read" />
-            Leídos <strong>{stats.read}</strong>
-          </span>
-          <span className="legend-item">
-            <span className="legend-dot dot-have" />
-            Tengo <strong>{stats.haveOnly}</strong>
-          </span>
-          <span className="legend-item">
-            <span className="legend-dot dot-none" />
-            Sin leer <strong>{stats.neither}</strong>
-          </span>
-        </div>
+            <div className="stacked-legend">
+              <span className="legend-item">
+                <span className="legend-dot dot-read" />
+                Leídos <strong>{stats.read}</strong>
+              </span>
+              <span className="legend-item">
+                <span className="legend-dot dot-have" />
+                Tengo <strong>{stats.haveOnly}</strong>
+              </span>
+              <span className="legend-item">
+                <span className="legend-dot dot-none" />
+                Sin leer <strong>{stats.neither}</strong>
+              </span>
+            </div>
+          </>
+        )}
       </div>
 
       <main className="book-list">
