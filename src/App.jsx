@@ -22,6 +22,10 @@ function saveState(state) {
   localStorage.setItem(STORAGE_KEY, JSON.stringify(state))
 }
 
+function pct(n, total) {
+  return total ? Math.round((n / total) * 100) : 0
+}
+
 export default function App() {
   const [checks, setChecks] = useState(loadState)
   const [activeCategory, setActiveCategory] = useState('all')
@@ -29,9 +33,7 @@ export default function App() {
   const [importMsg, setImportMsg] = useState(null)
   const fileInputRef = useRef(null)
 
-  useEffect(() => {
-    saveState(checks)
-  }, [checks])
+  useEffect(() => { saveState(checks) }, [checks])
 
   useEffect(() => {
     document.documentElement.setAttribute('data-theme', theme)
@@ -91,9 +93,32 @@ export default function App() {
     [activeCategory]
   )
 
-  const haveCount = BOOKS.filter(b => checks[b.id]?.have).length
-  const readCount = BOOKS.filter(b => checks[b.id]?.read).length
+  // Estadísticas globales (header)
+  const globalHave = BOOKS.filter(b => checks[b.id]?.have).length
+  const globalRead = BOOKS.filter(b => checks[b.id]?.read).length
   const total = BOOKS.length
+
+  // Estadísticas del filtro activo (panel de gráfico)
+  const stats = useMemo(() => {
+    const t = filtered.length
+    const have = filtered.filter(b => checks[b.id]?.have).length
+    const read = filtered.filter(b => checks[b.id]?.read).length
+    const haveOnly = have - read
+    const neither = t - have
+    return {
+      total: t,
+      have,
+      read,
+      haveOnly,
+      neither,
+      havePct: pct(have, t),
+      readPct: pct(read, t),
+      haveOnlyPct: pct(haveOnly, t),
+      neitherPct: pct(neither, t),
+    }
+  }, [filtered, checks])
+
+  const activeCatLabel = CATEGORIES.find(c => c.id === activeCategory)?.label ?? 'Todo'
 
   return (
     <div className="app">
@@ -136,12 +161,12 @@ export default function App() {
 
         <div className="stats">
           <span className="stat">
-            <span className="stat-number">{haveCount}</span>
+            <span className="stat-number">{globalHave}</span>
             <span className="stat-label"> de {total} tengo</span>
           </span>
           <span className="stat-sep">·</span>
           <span className="stat">
-            <span className="stat-number">{readCount}</span>
+            <span className="stat-number">{globalRead}</span>
             <span className="stat-label"> de {total} leídos</span>
           </span>
         </div>
@@ -159,12 +184,87 @@ export default function App() {
         ))}
       </nav>
 
+      {/* Panel de estadísticas */}
+      <div className="chart-panel">
+        <div className="chart-heading">
+          <span className="chart-title">{activeCatLabel}</span>
+          <span className="chart-subtitle">{stats.total} libros</span>
+        </div>
+
+        <div className="progress-row">
+          <span className="progress-label">Lo tengo</span>
+          <div className="progress-track">
+            <div className="progress-fill have" style={{ width: `${stats.havePct}%` }} />
+          </div>
+          <span className="progress-info">
+            <strong>{stats.have}</strong>/{stats.total}
+            <span className="progress-pct">{stats.havePct}%</span>
+          </span>
+        </div>
+
+        <div className="progress-row">
+          <span className="progress-label">Lo leí</span>
+          <div className="progress-track">
+            <div className="progress-fill read" style={{ width: `${stats.readPct}%` }} />
+          </div>
+          <span className="progress-info">
+            <strong>{stats.read}</strong>/{stats.total}
+            <span className="progress-pct">{stats.readPct}%</span>
+          </span>
+        </div>
+
+        <div className="stacked-bar">
+          {stats.read > 0 && (
+            <div
+              className="seg seg-read"
+              style={{ width: `${stats.readPct}%` }}
+              title={`Leídos: ${stats.read}`}
+            />
+          )}
+          {stats.haveOnly > 0 && (
+            <div
+              className="seg seg-have"
+              style={{ width: `${stats.haveOnlyPct}%` }}
+              title={`Tengo, sin leer: ${stats.haveOnly}`}
+            />
+          )}
+          {stats.neither > 0 && (
+            <div
+              className="seg seg-none"
+              style={{ width: `${stats.neitherPct}%` }}
+              title={`Sin leer: ${stats.neither}`}
+            />
+          )}
+        </div>
+
+        <div className="stacked-legend">
+          <span className="legend-item">
+            <span className="legend-dot dot-read" />
+            Leídos <strong>{stats.read}</strong>
+          </span>
+          <span className="legend-item">
+            <span className="legend-dot dot-have" />
+            Tengo <strong>{stats.haveOnly}</strong>
+          </span>
+          <span className="legend-item">
+            <span className="legend-dot dot-none" />
+            Sin leer <strong>{stats.neither}</strong>
+          </span>
+        </div>
+      </div>
+
       <main className="book-list">
         <div className="book-list-header">
           <span className="col-year">Año</span>
           <span className="col-title">Título</span>
-          <span className="col-check">Lo tengo</span>
-          <span className="col-check">Lo leí</span>
+          <span className="col-check">
+            Lo tengo
+            <span className="col-count">{stats.have}/{stats.total}</span>
+          </span>
+          <span className="col-check">
+            Lo leí
+            <span className="col-count">{stats.read}/{stats.total}</span>
+          </span>
         </div>
         {filtered.map(book => {
           const state = checks[book.id] || { have: false, read: false }
