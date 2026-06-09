@@ -17,21 +17,18 @@ concurrency:
 jobs:
   build:
     runs-on: ubuntu-latest
-    defaults:
-      run:
-        working-directory: bookManager
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
         with:
           node-version: 20
           cache: yarn
-          cache-dependency-path: bookManager/yarn.lock
+          cache-dependency-path: yarn.lock
       - run: yarn install --frozen-lockfile
       - run: yarn build
       - uses: actions/upload-pages-artifact@v3
         with:
-          path: bookManager/dist
+          path: dist
 
   deploy:
     needs: build
