@@ -3,8 +3,9 @@ import { BOOKS, CATEGORIES } from './books'
 import './App.css'
 
 const STORAGE_KEY = 'sk-books-checklist'
-const THEME_KEY = 'sk-books-theme'
-const STATS_KEY = 'sk-books-stats-open'
+const THEME_KEY   = 'sk-books-theme'
+const STATS_KEY   = 'sk-books-stats-open'
+const LANG_KEY    = 'sk-books-lang'
 
 function loadState() {
   try {
@@ -19,6 +20,10 @@ function loadTheme() {
   return localStorage.getItem(THEME_KEY) || 'light'
 }
 
+function loadLang() {
+  return localStorage.getItem(LANG_KEY) || 'es'
+}
+
 function saveState(state) {
   localStorage.setItem(STORAGE_KEY, JSON.stringify(state))
 }
@@ -28,12 +33,13 @@ function pct(n, total) {
 }
 
 export default function App() {
-  const [checks, setChecks] = useState(loadState)
+  const [checks, setChecks]       = useState(loadState)
   const [activeCategory, setActiveCategory] = useState('all')
-  const [theme, setTheme] = useState(loadTheme)
+  const [theme, setTheme]         = useState(loadTheme)
   const [statsOpen, setStatsOpen] = useState(
     () => localStorage.getItem(STATS_KEY) !== 'false'
   )
+  const [lang, setLang]           = useState(loadLang)
   const [importMsg, setImportMsg] = useState(null)
   const fileInputRef = useRef(null)
 
@@ -53,6 +59,18 @@ export default function App() {
       localStorage.setItem(STATS_KEY, String(!o))
       return !o
     })
+  }
+
+  function toggleLang() {
+    setLang(l => {
+      const next = l === 'es' ? 'en' : 'es'
+      localStorage.setItem(LANG_KEY, next)
+      return next
+    })
+  }
+
+  function bookTitle(book) {
+    return lang === 'es' ? (book.titleEs ?? book.title) : book.title
   }
 
   function toggle(id, field) {
@@ -104,7 +122,6 @@ export default function App() {
     [activeCategory]
   )
 
-  // Estadísticas del filtro activo (panel de gráfico)
   const stats = useMemo(() => {
     const t = filtered.length
     const have = filtered.filter(b => checks[b.id]?.have).length
@@ -117,10 +134,10 @@ export default function App() {
       read,
       haveOnly,
       neither,
-      havePct: pct(have, t),
-      readPct: pct(read, t),
+      havePct:     pct(have, t),
+      readPct:     pct(read, t),
       haveOnlyPct: pct(haveOnly, t),
-      neitherPct: pct(neither, t),
+      neitherPct:  pct(neither, t),
     }
   }, [filtered, checks])
 
@@ -132,6 +149,13 @@ export default function App() {
         <div className="header-top">
           <h1>Stephen King — Lista de libros</h1>
           <div className="toolbar">
+            <button
+              className="tool-btn lang-btn"
+              onClick={toggleLang}
+              title={lang === 'es' ? 'Switch to English titles' : 'Ver títulos en español'}
+            >
+              {lang === 'es' ? 'EN' : 'ES'}
+            </button>
             <button className="tool-btn" onClick={exportData} title="Guardar progreso en archivo JSON">
               <span className="btn-icon">↓</span> Exportar
             </button>
@@ -164,8 +188,6 @@ export default function App() {
             {importMsg}
           </div>
         )}
-
-
       </header>
 
       <nav className="filters">
@@ -261,6 +283,7 @@ export default function App() {
         </div>
         {filtered.map(book => {
           const state = checks[book.id] || { have: false, read: false }
+          const displayTitle = bookTitle(book)
           return (
             <div
               key={book.id}
@@ -268,7 +291,7 @@ export default function App() {
             >
               <span className="col-year">{book.year}</span>
               <span className="col-title">
-                {book.title}
+                {displayTitle}
                 {book.note && <span className="book-note"> — {book.note}</span>}
               </span>
               <span className="col-check">
@@ -276,7 +299,7 @@ export default function App() {
                   type="checkbox"
                   checked={state.have}
                   onChange={() => toggle(book.id, 'have')}
-                  aria-label={`Tengo ${book.title}`}
+                  aria-label={`Tengo ${displayTitle}`}
                 />
               </span>
               <span className="col-check">
@@ -284,7 +307,7 @@ export default function App() {
                   type="checkbox"
                   checked={state.read}
                   onChange={() => toggle(book.id, 'read')}
-                  aria-label={`Leí ${book.title}`}
+                  aria-label={`Leí ${displayTitle}`}
                 />
               </span>
             </div>
