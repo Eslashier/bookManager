@@ -79,7 +79,10 @@ export const BOOKS = [
 
   // Colecciones de cuentos
   { id: 'night-shift',          title: 'Night Shift',              titleEs: 'El umbral de la noche',       year: 1978, category: 'collections' },
+  { id: 'different-seasons',    title: 'Different Seasons',        titleEs: 'Las cuatro estaciones',       year: 1982, category: 'collections' },
   { id: 'skeleton-crew',        title: 'Skeleton Crew',            titleEs: 'Historias fantásticas',       year: 1985, category: 'collections' },
+  { id: 'four-past-midnight-1', title: 'Four Past Midnight, Vol. 1', titleEs: '2 después de medianoche', year: 1990, category: 'collections', note: 'The Langoliers · Secret Window' },
+  { id: 'four-past-midnight-2', title: 'Four Past Midnight, Vol. 2', titleEs: '4 después de medianoche', year: 1990, category: 'collections', note: 'The Library Policeman · The Sun Dog' },
   { id: 'nightmares-dreamscapes',title: 'Nightmares & Dreamscapes',titleEs: 'Pesadillas y alucinaciones',  year: 1993, category: 'collections' },
   { id: 'everythings-eventual', title: "Everything's Eventual",    titleEs: 'Todo es eventual',            year: 2002, category: 'collections' },
   { id: 'just-after-sunset',    title: 'Just After Sunset',        titleEs: 'Después del anochecer',       year: 2008, category: 'collections' },
