@@ -87,6 +87,7 @@ export const BOOKS = [
   { id: 'everythings-eventual', title: "Everything's Eventual",    titleEs: 'Todo es eventual',            year: 2002, category: 'collections' },
   { id: 'just-after-sunset',    title: 'Just After Sunset',        titleEs: 'Después del anochecer',       year: 2008, category: 'collections' },
   { id: 'full-dark-no-stars',   title: 'Full Dark, No Stars',      titleEs: 'Todo oscuro, sin estrellas',  year: 2010, category: 'collections' },
+  { id: 'blockade-billy',       title: 'Blockade Billy',           titleEs: 'Blockade Billy',              year: 2010, category: 'collections', note: 'incluye Moralidad' },
   { id: 'bazaar-of-bad-dreams', title: 'The Bazaar of Bad Dreams', titleEs: 'El bazar de los malos sueños',year: 2015, category: 'collections' },
   { id: 'if-it-bleeds',         title: 'If It Bleeds',             titleEs: 'Si sangra',                   year: 2020, category: 'collections' },
   { id: 'you-like-it-darker',   title: 'You Like It Darker',       titleEs: 'Si te gusta la oscuridad',    year: 2024, category: 'collections' },
